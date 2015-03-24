@@ -1,0 +1,21 @@
+# These actions will be applied only for finnish IPs
+[fi]
+  # Ports comma separated
+  ports=22
+
+  # Action to perform for these ports: ACCEPT  or  DROP
+  action=ACCEPT
+
+
+
+# These actions will be applied for everyone
+[all]
+  # Ports comma separated
+  ports=113,80,443,8080
+
+  # Action to perform for these ports: ACCEPT  or  DROP
+  action=ACCEPT
+
+
+
+# All non-listed ports are blocked for everyone
