@@ -8,7 +8,7 @@ Restrict iptables by country
  * https://github.com/rudimeier/bash_ini_parser
 
 # Installing:
- `git clone https://github.com/kirbo/restrict-iptables-by-country.git`
- `cd restrict-iptables-by-country`
- `git submodule update --init`
+ * `git clone https://github.com/kirbo/restrict-iptables-by-country.git`
+ * `cd restrict-iptables-by-country`
+ * `git submodule update --init`
 
