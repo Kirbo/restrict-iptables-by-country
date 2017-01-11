@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT=$(realpath $0)
+DIR=$(dirname $SCRIPT)
+
 declare -A ZONE_FILES
 ZONE_FILES=(
   [IPV4]='http://www.ipdeny.com/ipblocks/data/countries/all-zones.tar.gz'
@@ -9,6 +12,6 @@ ZONE_FILES=(
 
 declare -A DATA_DIR
 DATA_DIR=(
-  ['IPV4']='assets/countries/ipv4'
-  ['IPV6']='assets/countries/ipv6'
+  ['IPV4']="${DIR}/assets/countries/ipv4"
+  ['IPV6']="${DIR}/assets/countries/ipv6"
 )

@@ -1,23 +1,35 @@
 #!/bin/bash
 
+SCRIPT=$(realpath $0)
+DIR=$(dirname $SCRIPT)
+
 INIT () {
   ZONE=$1
   MODE=$2
 
-  read_ini 'config.ini'
-
   if [ "$MODE" == "START" ]; then
-    START "$ZONE" "${INI__ALL_SECTIONS}"
+    START "$ZONE"
   elif [ "$MODE" == "RESTART" ]; then
-    RESTART "$ZONE" "${INI__ALL_SECTIONS}"
+    STOP "$ZONE"
+    sleep 3
+    START "$ZONE"
   elif [ "$MODE" == "STOP" ]; then
-    STOP "$ZONE" "${INI__ALL_SECTIONS}"
+    STOP "$ZONE"
+  elif [ "$MODE" == "INSTALL" ]; then
+    INSTALL
   fi
+exit
 }
 
 START () {
   ZONE=$1
-  INI=$2
+  read_ini "${DIR}/config.ini"
+  INI="${INI__ALL_SECTIONS}"
+
+  echo "Starting..."
+
+  mkdir -p "${DIR}/temp/"
+  cp "${DIR}/config.ini" "${DIR}/temp/config.ini"
 
   DOWNLOAD_ZONE_FILES "$ZONE"
 
@@ -34,6 +46,12 @@ START () {
   iptables -A INPUT -p udp -j REJECT --reject-with icmp-port-unreachable
   iptables -A INPUT -p tcp -j REJECT --reject-with tcp-reset
   iptables -A INPUT -j REJECT --reject-with icmp-proto-unreachable
+
+  iptables -I INPUT -p tcp --dport 1723 -m state --state NEW -j ACCEPT
+  iptables -I INPUT -p gre -j ACCEPT
+  iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
+  iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -s 192.168.1.0/24 -j TCPMSS --clamp-mss-to-pmtu
+  iptables -P FORWARD ACCEPT
 }
 
 RESTART () {
@@ -46,7 +64,10 @@ RESTART () {
 
 STOP () {
   ZONE=$1
-  INI=$2
+  read_ini "${DIR}/temp/config.ini"
+  INI="${INI__ALL_SECTIONS}"
+
+  echo "Stopping..."
 
   iptables -P INPUT ACCEPT
   iptables -P FORWARD ACCEPT
@@ -176,4 +197,12 @@ APPLY () {
 
 ROUND () {
   echo $(printf %.$2f $(echo "scale=$2;(((10^$2)*$1)+0.5)/(10^$2)" | bc))
+}
+
+INSTALL () {
+  STARTUP_PATH="/etc/init.d/ribc"
+
+  cp "${DIR}/assets/startup.sh" $STARTUP_PATH
+  chmod 755 $STARTUP_PATH
+  update-rc.d ribc defaults
 }
