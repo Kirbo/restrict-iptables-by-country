@@ -10,8 +10,7 @@ INIT () {
   if [ "$MODE" == "START" ]; then
     START "$ZONE"
   elif [ "$MODE" == "RESTART" ]; then
-    STOP "$ZONE"
-    sleep 3
+    STOP "$ZONE" ; sleep 3
     START "$ZONE"
   elif [ "$MODE" == "STOP" ]; then
     STOP "$ZONE"

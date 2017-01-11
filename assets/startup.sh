@@ -22,6 +22,7 @@ case "$1" in
 		;;
 	restart)
 		/bin/bash $DAEMON RESTART
+		wait
 		;;
 	*)
 		echo "Usage: $0 {start|stop|restart}"
